@@ -1,3 +1,8 @@
+# Ubuntu Rosetta VM
+
+This builds the Ubuntu VM with Rosetta support as demonstrated by Apple in sample code,
+goal is to have an easy to access Ubuntu VM with Rosetta support for testing or development purposes.
+
 ## Rosetta-enabled virtual machine based on Apple Sample Code
 
 ### Live stream
