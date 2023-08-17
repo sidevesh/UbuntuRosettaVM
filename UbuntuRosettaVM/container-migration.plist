@@ -4,7 +4,7 @@
 <dict>
 	<key>Move</key>
 	<array>
-		<string>${Home}/RosettaVM.bundle</string>
+		<string>${Home}/UbuntuRosettaVM.bundle</string>
 	</array>
 </dict>
 </plist>

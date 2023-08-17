@@ -7,12 +7,12 @@ The app delegate that sets up and starts the virtual machine.
 
 import Virtualization
 
-let vmBundlePath = NSHomeDirectory() + "/RosettaVM.bundle/"
+let vmBundlePath = NSHomeDirectory() + "/UbuntuRosettaVM.bundle/"
 let mainDiskImagePath = vmBundlePath + "Disk.img"
 let efiVariableStorePath = vmBundlePath + "NVRAM"
 let machineIdentifierPath = vmBundlePath + "MachineIdentifier"
 
-struct RosettaVMError: Error, LocalizedError {
+struct UbuntuRosettaVMError: Error, LocalizedError {
     let errorDescription: String?
 
     init(_ description: String) {
@@ -43,7 +43,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, VZVirtualMachineDelegate {
 
         switch rosettaAvailability {
         case .notSupported:
-            throw RosettaVMError("Rosetta is not supported on your system")
+            throw UbuntuRosettaVMError("Rosetta is not supported on your system")
 
         case .notInstalled:
             do {
@@ -72,7 +72,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, VZVirtualMachineDelegate {
         case .installed:
             break // Ready to go.
         @unknown default:
-            throw RosettaVMError("Unknown error returned while checking for Rosetta")
+            throw UbuntuRosettaVMError("Unknown error returned while checking for Rosetta")
         }
     }
 #endif
@@ -81,7 +81,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, VZVirtualMachineDelegate {
         do {
             try FileManager.default.createDirectory(atPath: vmBundlePath, withIntermediateDirectories: false)
         } catch {
-            throw RosettaVMError("There was an error creating “\(vmBundlePath)“.")
+            throw UbuntuRosettaVMError("There was an error creating “\(vmBundlePath)“.")
         }
     }
 
@@ -89,18 +89,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, VZVirtualMachineDelegate {
     private func createMainDiskImage() throws {
         let diskCreated = FileManager.default.createFile(atPath: mainDiskImagePath, contents: nil, attributes: nil)
         if !diskCreated {
-            throw RosettaVMError("Could not create the VM's main disk image.")
+            throw UbuntuRosettaVMError("Could not create the VM's main disk image.")
         }
 
         guard let mainDiskFileHandle = try? FileHandle(forWritingTo: URL(fileURLWithPath: mainDiskImagePath)) else {
-            throw RosettaVMError("Could not open the VM's main disk image.")
+            throw UbuntuRosettaVMError("Could not open the VM's main disk image.")
         }
 
         do {
             // 64 GB disk space.
             try mainDiskFileHandle.truncate(atOffset: 64 * 1024 * 1024 * 1024)
         } catch {
-            throw RosettaVMError("Could not truncate the VM's main disk image.")
+            throw UbuntuRosettaVMError("Could not truncate the VM's main disk image.")
         }
     }
 
@@ -108,7 +108,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, VZVirtualMachineDelegate {
 
     private func createBlockDeviceConfiguration() throws -> VZVirtioBlockDeviceConfiguration {
         guard let mainDiskAttachment = try? VZDiskImageStorageDeviceAttachment(url: URL(fileURLWithPath: mainDiskImagePath), readOnly: false) else {
-            throw RosettaVMError("Could not attach the VM's main disk image.")
+            throw UbuntuRosettaVMError("Could not attach the VM's main disk image.")
         }
 
         let mainDisk = VZVirtioBlockDeviceConfiguration(attachment: mainDiskAttachment)
@@ -144,11 +144,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, VZVirtualMachineDelegate {
     private func retrieveMachineIdentifier() throws -> VZGenericMachineIdentifier {
         // Retrieve the machine identifier.
         guard let machineIdentifierData = try? Data(contentsOf: URL(fileURLWithPath: machineIdentifierPath)) else {
-            throw RosettaVMError("Failed to retrieve the machine identifier data.")
+            throw UbuntuRosettaVMError("Failed to retrieve the machine identifier data.")
         }
 
         guard let machineIdentifier = VZGenericMachineIdentifier(dataRepresentation: machineIdentifierData) else {
-            throw RosettaVMError("Failed to create the machine identifier.")
+            throw UbuntuRosettaVMError("Failed to create the machine identifier.")
         }
 
         return machineIdentifier
@@ -156,7 +156,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, VZVirtualMachineDelegate {
 
     private func createEFIVariableStore() throws -> VZEFIVariableStore {
         guard let efiVariableStore = try? VZEFIVariableStore(creatingVariableStoreAt: URL(fileURLWithPath: efiVariableStorePath)) else {
-            throw RosettaVMError("Failed to create the EFI variable store.")
+            throw UbuntuRosettaVMError("Failed to create the EFI variable store.")
         }
 
         return efiVariableStore
@@ -164,7 +164,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, VZVirtualMachineDelegate {
 
     private func retrieveEFIVariableStore() throws -> VZEFIVariableStore {
         if !FileManager.default.fileExists(atPath: efiVariableStorePath) {
-            throw RosettaVMError("EFI variable store does not exist.")
+            throw UbuntuRosettaVMError("EFI variable store does not exist.")
         }
 
         return VZEFIVariableStore(url: URL(fileURLWithPath: efiVariableStorePath))
@@ -172,7 +172,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, VZVirtualMachineDelegate {
 
     private func createUSBMassStorageDeviceConfiguration() throws -> VZUSBMassStorageDeviceConfiguration {
         guard let intallerDiskAttachment = try? VZDiskImageStorageDeviceAttachment(url: installerISOPath!, readOnly: true) else {
-            throw RosettaVMError("Failed to create installer's disk attachment.")
+            throw UbuntuRosettaVMError("Failed to create installer's disk attachment.")
         }
 
         return VZUSBMassStorageDeviceConfiguration(attachment: intallerDiskAttachment)
@@ -256,7 +256,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, VZVirtualMachineDelegate {
 
         disksArray.add(try createBlockDeviceConfiguration())
         guard let disks = disksArray as? [VZStorageDeviceConfiguration] else {
-            throw RosettaVMError("Invalid disksArray.")
+            throw UbuntuRosettaVMError("Invalid disksArray.")
         }
         virtualMachineConfiguration.storageDevices = disks
 
@@ -281,7 +281,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, VZVirtualMachineDelegate {
 
             virtualMachineConfiguration.directorySharingDevices = [ fileSystemDevice ]
         } catch {
-            throw RosettaVMError("Rosetta is not available")
+            throw UbuntuRosettaVMError("Rosetta is not available")
         }
 #endif
 
@@ -345,10 +345,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, VZVirtualMachineDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         NSApp.activate(ignoringOtherApps: true)
         Task { @MainActor in
-            // If "RosettaVM.bundle" doesn't exist, the sample app tries to create
+            // If "UbuntuRosettaVM.bundle" doesn't exist, the sample app tries to create
             // one and install Linux onto an empty disk image from the ISO image,
             // otherwise, it tries to directly boot from the disk image inside
-            // the "RosettaVM.bundle".
+            // the "UbuntuRosettaVM.bundle".
             if !FileManager.default.fileExists(atPath: vmBundlePath) {
                 needsInstall = true
                 do {
@@ -412,7 +412,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, VZVirtualMachineDelegate {
                 try self.virtualMachine.requestStop()
                 return NSApplication.TerminateReply.terminateCancel
             } else {
-                throw RosettaVMError("Unable to request stop")
+                throw UbuntuRosettaVMError("Unable to request stop")
             }
         } catch let error {
             let message = "Failed to stop VM"

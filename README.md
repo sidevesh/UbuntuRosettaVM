@@ -20,10 +20,10 @@ do the following:
 1. Close the settings window
 1. Clone the git repository off GitHub, e.g.
    `git clone https://github.com/diddledani/macOS-Linux-VM-with-Rosetta.git`
-1. Open the `RosettaVM.xcodeproj` project file in XCode
+1. Open the `UbuntuRosettaVM.xcodeproj` project file in XCode
 1. Click the left-hand sidebar entry at the top of the tree labelled
-   `RosettaVM`
-1. In the right-hand pane navigate to the TARGETS entry `RosettaVM`
+   `UbuntuRosettaVM`
+1. In the right-hand pane navigate to the TARGETS entry `UbuntuRosettaVM`
 1. Click the top-bar entry labelled `Signing & Capabilities`
 1. In the `Team` drop-down select your Apple Developer account/team, and set
    the `Signing Certificate` drop-down to `Sign to run locally`
@@ -31,7 +31,7 @@ do the following:
 
 ### Setting up Rosetta
 
-When you start the RosettaVM app, you should be prompted by the app to select
+When you start the UbuntuRosettaVM app, you should be prompted by the app to select
 a Linux installer ISO.
 
 - [Ubuntu 22.04.1 Desktop](https://cdimage.ubuntu.com/jammy/daily-live/current/jammy-desktop-arm64.iso) (This is a daily build of the ISO and is classed as unstable, meaning that any particular day's download may have bugs - There is currently no 'stable' ISO for the desktop release)
